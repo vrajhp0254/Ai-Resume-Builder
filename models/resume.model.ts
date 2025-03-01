@@ -9,6 +9,7 @@ interface IExperience {
   startDate: string;
   endDate: string;
   currentlyWorking: boolean;
+  description: string;
 }
 
 interface IEducation {
@@ -20,7 +21,6 @@ interface IEducation {
 
 interface ISkill {
   name: string;
-  rating: number;
 }
 
 export interface IResume extends Document {
@@ -38,6 +38,10 @@ export interface IResume extends Document {
 }
 
 // Define the schema
+const skillSchema = new Schema({
+  name: { type: String, required: true }
+});
+
 const resumeSchema: Schema = new Schema(
   {
     userId: { type: String, required: true }, // Reference to the user
@@ -67,12 +71,7 @@ const resumeSchema: Schema = new Schema(
         degree: { type: String, required: true },
       },
     ],
-    skills: [
-      {
-        name: { type: String, required: true },
-        rating: { type: Number, required: true },
-      },
-    ],
+    skills: [skillSchema],
   },
   { timestamps: true }
 );

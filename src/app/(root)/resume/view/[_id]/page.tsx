@@ -2,6 +2,7 @@
 import jsPDF from "jspdf";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { themes, ThemeConfig } from '@/app/themes/resumeThemes';
 
 interface Experience {
   title: string;
@@ -11,6 +12,7 @@ interface Experience {
   startDate: string;
   endDate?: string;
   currentlyWorking: boolean;
+  description: string;
 }
 
 interface Education {
@@ -22,7 +24,6 @@ interface Education {
 
 interface Skill {
   name: string;
-  rating: number;
 }
 
 interface ResumeData {
@@ -36,6 +37,7 @@ interface ResumeData {
   experience: Experience[];
   education: Education[];
   skills: Skill[];
+  theme?: string;
 }
 
 const Page = () => {
@@ -70,72 +72,151 @@ const Page = () => {
       experience,
       education,
       skills,
+      theme = 'modern' // default theme
     } = resumeData;
-  
+
+    const themeConfig: ThemeConfig = themes[theme] || themes.modern;
     const doc = new jsPDF();
-  
-    // Set Title
-    doc.setFontSize(22);
-    doc.text(`${firstName} ${lastName}`, 20, 20);
-  
+    const margin = themeConfig.spacing.margin;
+    let yPos = margin;
+
+    // Header
+    doc.setFont(themeConfig.fonts.title);
+    doc.setTextColor(themeConfig.colors.primary);
+    doc.setFontSize(24);
+    doc.text(`${firstName} ${lastName}`, margin, yPos);
+    yPos += 12;
+
     // Job Title
+    doc.setFont(themeConfig.fonts.heading);
+    doc.setTextColor(themeConfig.colors.secondary);
     doc.setFontSize(16);
-    doc.text(jobTitle, 20, 30);
-  
-    // Contact Information
-    doc.setFontSize(12);
-    doc.text(`Address: ${address}`, 20, 40);
-    doc.text(`Phone: ${phone}`, 20, 50);
-    doc.text(`Email: ${email}`, 20, 60);
-  
+    doc.text(jobTitle, margin, yPos);
+    yPos += 15;
+
+    // Contact Info
+    doc.setFont(themeConfig.fonts.body);
+    doc.setTextColor(themeConfig.colors.text);
+    doc.setFontSize(10);
+    const contactInfo = [
+      `Email: ${email}`,
+      `Phone: ${phone}`,
+      `Address: ${address}`
+    ];
+    contactInfo.forEach(info => {
+      doc.text(info, margin, yPos);
+      yPos += 6;
+    });
+    yPos += 10;
+
     // Summary
+    doc.setFont(themeConfig.fonts.heading);
+    doc.setTextColor(themeConfig.colors.primary);
     doc.setFontSize(14);
-    doc.text("Summary:", 20, 80);
-    doc.setFontSize(12);
-    const summaryLines = doc.splitTextToSize(summary, 180); // Adjust width as needed
-    const summaryHeight = summaryLines.length * 10; // Assuming 10 units per line height
-    doc.text(summaryLines, 20, 90); // Draw the lines starting at the specified position
-  
-    // Calculate the Y position for the Experience section
-    let experienceY = 90 + summaryHeight + 10; // Adding an extra 10 for spacing
-  
-    // Experience
-    doc.setFontSize(14);
-    doc.text("Experience:", 20, experienceY);
-    experience.forEach((exp, index) => {
-      const endDate = exp.currentlyWorking ? "Present" : exp.endDate;
-      doc.setFontSize(12);
-      const experienceLine = `${exp.title} at ${exp.companyName}, ${exp.city}, ${exp.state} (${exp.startDate} - ${endDate})`;
-      const experienceLineHeight = doc.getTextDimensions(experienceLine).h;
-      
-      doc.text(experienceLine, 20, experienceY + (index + 1) * experienceLineHeight);
+    doc.text("Professional Summary", margin, yPos);
+    yPos += 8;
+
+    doc.setFont(themeConfig.fonts.body);
+    doc.setTextColor(themeConfig.colors.text);
+    doc.setFontSize(11);
+    const summaryLines = doc.splitTextToSize(summary, 170);
+    summaryLines.forEach(line => {
+      doc.text(line, margin, yPos);
+      yPos += 6;
     });
-  
-    // Calculate Y position for the Education section
-    let educationY = experienceY + (experience.length + 1) * 10; // Adding an extra 10 for spacing
-  
-    // Education
+    yPos += 10;
+
+    // Experience Section
+    doc.setFont(themeConfig.fonts.heading);
+    doc.setTextColor(themeConfig.colors.primary);
     doc.setFontSize(14);
-    doc.text("Education:", 20, educationY);
-    education.forEach((edu, index) => {
+    doc.text("Professional Experience", margin, yPos);
+    yPos += 8;
+
+    experience.forEach(exp => {
+      // Job Title and Company
+      doc.setFont(themeConfig.fonts.heading);
+      doc.setTextColor(themeConfig.colors.secondary);
       doc.setFontSize(12);
-      const educationLine = `${edu.degree} from ${edu.universityName} (${edu.startDate} - ${edu.endDate})`;
-      doc.text(educationLine, 20, educationY + (index + 1) * 10);
+      doc.text(`${exp.title} at ${exp.companyName}`, margin, yPos);
+      yPos += 6;
+
+      // Location and Dates
+      doc.setFont(themeConfig.fonts.body);
+      doc.setTextColor(themeConfig.colors.text);
+      doc.setFontSize(10);
+      const dateRange = `${exp.startDate} - ${exp.currentlyWorking ? 'Present' : exp.endDate}`;
+      doc.text(`${exp.city}, ${exp.state} | ${dateRange}`, margin, yPos);
+      yPos += 6;
+
+      // Description - Check if exists and handle line breaks
+      if (exp.description) {
+        const maxWidth = 170; // Maximum width for text
+        const descLines = doc.splitTextToSize(exp.description, maxWidth);
+        descLines.forEach(line => {
+          if (yPos > 270) { // Check if we need a new page
+            doc.addPage();
+            yPos = margin;
+          }
+          doc.text(line, margin, yPos);
+          yPos += 5;
+        });
+      }
+      yPos += 8;
     });
-  
-    // Calculate Y position for the Skills section
-    let skillsY = educationY + (education.length + 1) * 10; // Adding an extra 10 for spacing
-  
-    // Skills
+
+    // Education Section
+    yPos += 5;
+    doc.setFont(themeConfig.fonts.heading);
+    doc.setTextColor(themeConfig.colors.primary);
     doc.setFontSize(14);
-    doc.text("Skills:", 20, skillsY);
-    doc.setFontSize(12);
-    doc.text(
-      skills.map(skill => `${skill.name} (Rating: ${skill.rating})`).join(", "),
-      20,
-      skillsY + 10 // Adjust Y position for skills
-    );
-  
+    doc.text("Education", margin, yPos);
+    yPos += 8;
+
+    education.forEach(edu => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = margin;
+      }
+      doc.setFont(themeConfig.fonts.body);
+      doc.setTextColor(themeConfig.colors.text);
+      doc.setFontSize(12);
+      doc.text(`${edu.degree} from ${edu.universityName}`, margin, yPos);
+      yPos += 5;
+      doc.setFontSize(10);
+      doc.text(`${edu.startDate} - ${edu.endDate}`, margin, yPos);
+      yPos += 8;
+    });
+
+    // Skills Section
+    yPos += 5;
+    doc.setFont(themeConfig.fonts.heading);
+    doc.setTextColor(themeConfig.colors.primary);
+    doc.setFontSize(14);
+    doc.text("Skills", margin, yPos);
+    yPos += 8;
+
+    // Format skills in columns
+    const skillsPerLine = 3;
+    const skillGroups = [];
+    for (let i = 0; i < skills.length; i += skillsPerLine) {
+      skillGroups.push(skills.slice(i, i + skillsPerLine));
+    }
+
+    doc.setFont(themeConfig.fonts.body);
+    doc.setTextColor(themeConfig.colors.text);
+    doc.setFontSize(11);
+
+    skillGroups.forEach(group => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = margin;
+      }
+      const skillLine = group.map(skill => skill.name).join("  •  ");
+      doc.text(skillLine, margin, yPos);
+      yPos += 6;
+    });
+
     // Save the PDF
     doc.save(`${firstName}_${lastName}_Resume.pdf`);
   };

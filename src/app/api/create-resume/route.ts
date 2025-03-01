@@ -27,7 +27,8 @@ export async function POST(req: Request) {
       experience,
       education,
       skills,
-    }: IResume = await req.json(); // Use req.json() to parse the request body
+      theme,
+    }: IResume & { theme: string } = await req.json(); // Use req.json() to parse the request body
 
     // Create a new resume document with the Clerk userId
     const newResume = new Resume({
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
       experience,
       education,
       skills,
+      theme,
     });
 
     // Save the resume in the database
