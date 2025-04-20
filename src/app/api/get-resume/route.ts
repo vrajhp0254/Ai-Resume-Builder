@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 import { connect } from '../../../../db/resumedb';
 import Resume from '../../../../models/resume.model';
 import { auth } from '@clerk/nextjs/server';
 
 // GET method
-export async function GET(req: NextRequest) {
+export async function GET() {
   await connect(); // Connect to the MongoDB database
 
   try {

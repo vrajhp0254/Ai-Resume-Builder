@@ -31,14 +31,14 @@ const Dashboard = () => {
     fetchResumes();
   }, []);
 
-  const handleDelete = async (_id: string) => { // Use _id as parameter
-    if (confirm('Are you sure you want to delete this resume?')) {
+  const handleDelete = async (_id: string) => {
+    if (window.confirm("Are you sure you want to delete this resume?")) {
       try {
-        const res = await fetch(`/api/resumes/${_id}`, { method: 'DELETE' }); // Use _id in the URL
+        const res = await fetch(`/api/resumes/${_id}`, { method: 'DELETE' });
         if (!res.ok) {
           throw new Error(`Failed to delete resume: ${res.statusText}`);
         }
-        setResumes((prevResumes) => prevResumes.filter((resume) => resume._id !== _id)); // Remove the deleted resume from the state
+        setResumes((prevResumes) => prevResumes.filter((resume) => resume._id !== _id));
       } catch (err) {
         console.error('Error deleting resume:', err);
         alert('Failed to delete the resume. Please try again.');

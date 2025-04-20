@@ -148,7 +148,7 @@ const ResumeBuilder = () => {
     index: number,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     const newSkills = [...formData.skills];
     newSkills[index] = { name: value };
     setFormData((prevData) => ({ ...prevData, skills: newSkills }));

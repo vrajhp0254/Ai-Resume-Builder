@@ -1,5 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { useClerk } from "@clerk/nextjs";
 
 import Link from "next/link";
 
