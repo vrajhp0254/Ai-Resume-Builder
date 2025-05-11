@@ -88,7 +88,7 @@ const Dashboard = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-600">You don't have any resumes yet.</p>
+          <p className="text-center text-gray-600">You don&apos;t have any resumes yet.</p>
         )}
       </div>
     </div>

@@ -1,12 +1,11 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { useClerk } from "@clerk/nextjs";
 
 import Link from "next/link";
 
 const Navbar = async () => {
   const { userId } = auth();
-  const user = await currentUser();
+  await currentUser();
   
   return (
     <nav className="bg-blue-100 backdrop-blur-md w-full fixed top-0 z-50 px-5 py-2">

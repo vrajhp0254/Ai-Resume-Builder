@@ -4,7 +4,7 @@ import { connect } from '../db/resumedb';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const db = await connect();
+    await connect();
     // Perform database actions, e.g., db.collection('users').find({})
     res.status(200).json({ message: 'Connected successfully' });
   } catch (error) {

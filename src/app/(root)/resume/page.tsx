@@ -75,7 +75,6 @@ const ResumeBuilder = () => {
     ],
   });
 
-  const [summary, setSummary] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('modern');
 
