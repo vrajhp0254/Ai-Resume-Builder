@@ -120,7 +120,7 @@ const Page = () => {
     doc.setTextColor(themeConfig.colors.text);
     doc.setFontSize(11);
     const summaryLines = doc.splitTextToSize(summary, 170);
-    summaryLines.forEach(line => {
+    summaryLines.forEach((line: string) => {
       doc.text(line, margin, yPos);
       yPos += 6;
     });
@@ -153,7 +153,7 @@ const Page = () => {
       if (exp.description) {
         const maxWidth = 170; // Maximum width for text
         const descLines = doc.splitTextToSize(exp.description, maxWidth);
-        descLines.forEach(line => {
+        descLines.forEach((line: string) => {
           if (yPos > 270) { // Check if we need a new page
             doc.addPage();
             yPos = margin;
